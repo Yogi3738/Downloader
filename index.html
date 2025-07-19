@@ -2,66 +2,83 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Download TikTok No WM by Yorie</title>
+  <title>Downloader TikTok Tanpa Watermark</title>
   <style>
     body {
-      background: #111;
-      color: white;
+      background-color: #0d0d0d;
+      color: #fff;
       font-family: sans-serif;
       text-align: center;
-      padding: 30px;
+      padding: 50px;
     }
-    input, button {
+    input {
       padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 6px;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 5px;
       border: none;
     }
     button {
-      background: #28a745;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #00d26a;
       color: white;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
-    .result {
-      margin-top: 20px;
+    #status {
+      margin-top: 15px;
+      color: #ccc;
     }
-    video {
-      margin-top: 10px;
-      max-width: 90%;
-      border-radius: 10px;
+    #videoLink {
+      margin-top: 15px;
+      display: block;
     }
   </style>
 </head>
 <body>
   <h1>Downloader TikTok Tanpa Watermark</h1>
-  <input type="text" id="tiktokUrl" placeholder="Masukkan URL TikTok" size="40">
-  <button onclick="getDownload()">Download</button>
-
-  <div class="result" id="result"></div>
+  <input id="tiktokUrl" placeholder="Tempel link TikTok di sini" />
+  <br>
+  <button onclick="download()">Download</button>
+  <p id="status"></p>
+  <a id="videoLink" href="#" target="_blank" style="display:none;">Klik di sini untuk download video</a>
 
   <script>
-    async function getDownload() {
-      const url = document.getElementById("tiktokUrl").value.trim();
-      const result = document.getElementById("result");
-      result.innerHTML = "Sedang memproses...";
+    async function resolveShortUrl(url) {
+      try {
+        const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+        return response.url;
+      } catch {
+        return url; // fallback
+      }
+    }
+
+    async function download() {
+      const inputUrl = document.getElementById("tiktokUrl").value.trim();
+      const status = document.getElementById("status");
+      const videoLink = document.getElementById("videoLink");
+      videoLink.style.display = 'none';
+      status.textContent = "Memproses link...";
 
       try {
-        const res = await fetch(`https://izumi-apis.zone.id/downloader/tiktokdl?url=https%3A%2F%2Fvt.tiktok.com%2FZSHgXt6a8W77C-vse7z%2F=${encodeURIComponent(url)}&hd=1`);
+        const resolvedUrl = await resolveShortUrl(inputUrl);
+        const apiUrl = `https://izumi-apis.zone.id/downloader/tiktokdl?url=${encodeURIComponent(resolvedUrl)}&hd=1`;
+
+        const res = await fetch(apiUrl);
         const data = await res.json();
 
-        if (data.data && data.data.play) {
-          result.innerHTML = `
-            <p>✅ Berhasil! Klik tombol di bawah untuk unduh:</p>
-            <video controls src="${data.data.play}"></video><br>
-            <a href="${data.data.play}" download class="btn">⬇ Unduh Video</a>
-          `;
+        if (data && data.result && data.result.nowatermark) {
+          videoLink.href = data.result.nowatermark;
+          videoLink.textContent = "Klik di sini untuk download video tanpa watermark";
+          videoLink.style.display = 'block';
+          status.textContent = "Berhasil!";
         } else {
-          result.innerHTML = "Gagal mengambil video. Periksa URL.";
+          status.textContent = "Gagal mengambil video. Coba link lain.";
         }
       } catch (err) {
-        result.innerHTML = "Terjadi kesalahan.";
-        console.error(err);
+        status.textContent = "Terjadi kesalahan: " + err.message;
       }
     }
   </script>
