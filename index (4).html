@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Download TikTok No WM by Yorie</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    video {
+      margin-top: 10px;
+      max-width: 90%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Downloader TikTok Tanpa Watermark</h1>
+  <input type="text" id="tiktokUrl" placeholder="Masukkan URL TikTok" size="40">
+  <button onclick="getDownload()">Download</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    async function getDownload() {
+      const url = document.getElementById("tiktokUrl").value.trim();
+      const result = document.getElementById("result");
+      result.innerHTML = "Sedang memproses...";
+
+      try {
+        const res = await fetch(`https://izumi-apis.zone.id/downloader/tiktokdl?url=https%3A%2F%2Fvt.tiktok.com%2FZSHgXt6a8W77C-vse7z%2F=${encodeURIComponent(url)}&hd=1`);
+        const data = await res.json();
+
+        if (data.data && data.data.play) {
+          result.innerHTML = `
+            <p>✅ Berhasil! Klik tombol di bawah untuk unduh:</p>
+            <video controls src="${data.data.play}"></video><br>
+            <a href="${data.data.play}" download class="btn">⬇ Unduh Video</a>
+          `;
+        } else {
+          result.innerHTML = "Gagal mengambil video. Periksa URL.";
+        }
+      } catch (err) {
+        result.innerHTML = "Terjadi kesalahan.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
